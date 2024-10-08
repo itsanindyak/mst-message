@@ -56,12 +56,8 @@ export async function POST(
       }
     } else {
       //registering new user
-      console.log("registering new user");
-      
-      
-      
+      console.log("registering new user...");
       const hashPassword = await bcrypt.hash(password, 10);
-      console.log("hashed password done !!!!");
       const expiryDate = new Date();
       expiryDate.setHours(expiryDate.getHours() + 1);
 
@@ -80,6 +76,8 @@ export async function POST(
     // send verification email
 
     const emailResponce = await sendVerifyEmail(email, username, verifycode);
+    console.log(emailResponce);
+    
 
     if (!emailResponce.success) {
       return Response.json(
