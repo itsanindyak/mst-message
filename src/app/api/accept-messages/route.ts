@@ -4,6 +4,7 @@ import { authOptions } from "../auth/[...nextauth]/option";
 import { dbConnect } from "@/lib/dbConnect";
 import { User } from "next-auth";
 import { response } from "@/types/ApiResponse";
+import mongoose from "mongoose";
 
 export async function POST(request: Request) {
   await dbConnect();
@@ -15,7 +16,7 @@ export async function POST(request: Request) {
     });
   }
 
-  const userid = session?.user._id;
+  const userid = new mongoose.Types.ObjectId(session?.user?._id);
   const { acceptMessage } = await request.json();
 
   try {
@@ -63,8 +64,7 @@ export async function GET(request: Request) {
     });
   }
 
-  const userid = session?.user._id;
-
+  const userid = new mongoose.Types.ObjectId(session?.user?._id);
   try {
     const user = await UserModel.findById(userid);
     if (!user) {
