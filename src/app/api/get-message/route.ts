@@ -7,38 +7,37 @@ import { response } from "@/types/ApiResponse";
 import mongoose from "mongoose";
 
 export async function GET(request: Request) {
-  await dbConnect();
+    await dbConnect();
 
-  const session = await getServerSession(authOptions);
-  if (!session || !session.user) {
+    const session = await getServerSession(authOptions);
+if (!session || !session.user) {
     return Response.json(new response(401, false, "You must be logged in."), {
-      status: 401,
+    status: 401,
     });
-  }
+    }
 
-  const userid = new mongoose.Types.ObjectId(session?.user?._id);
+    const userid = new mongoose.Types.ObjectId(session?.user?._id);
 
-  try {
+try {
     const user = await UserModel.aggregate([
-      { $match: { _id: userid } },
-      { $unwind: "$messages" },
-      { $sort: { "$messages.createdAt": -1 } },
-      { $group: { _id: "$_id", messages: { $push: "$messages" } } },
+    { $match: { _id: userid } },
+    { $unwind: "$messages" },
+    { $sort: { "$messages.createdAt": -1 } },
+    { $group: { _id: "$_id", messages: { $push: "$messages" } } },
     ]);
     if (!user || user.length === 0) {
-      return Response.json(new response(401, false, "User not found."), {
+    return Response.json(new response(401, false, "User not found."), {
         status: 401,
-      });
+    });
     }
     return Response.json(
-      new response(200, true, "Message fetched successfully", user[0].messages),
-      {
+    new response(200, true, "Message fetched successfully", user[0].messages),
+    {
         status: 200,
-      }
-    );
-  } catch (error) {
-    return Response.json(new response(500, false, "Error to get message."), {
-      status: 500,
     });
-  }
+} catch (error) {
+    return Response.json(new response(500, false, "Error to get message."), {
+        status: 500,
+    });
+}
 }
